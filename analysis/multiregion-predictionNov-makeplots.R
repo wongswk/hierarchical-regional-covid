@@ -13,8 +13,8 @@ Fraser <- read.csv("data-generated/daily-cases-Fraser.csv")
 daily_diffs <- rbind(Island$cases,Coastal$cases,Northern$cases,Interior$cases,Fraser$cases)
 pop_size <- c(843375,1225195,297570,795116,1889225)
 
-load("data-generated/fit-predNov-multiregion-loosepriors-mode.rda")
-mprov <- readRDS("data-generated/fit-predNov-provincewide-loosepriors-mode.rds")
+load("data-generated/fit-predNov-multiregion.rda")
+mprov <- readRDS("data-generated/fit-predNov-provincewide.rds")
 
 region_names <- c("Island", "Coastal", "Northern", "Interior", "Fraser")
 library(magrittr)

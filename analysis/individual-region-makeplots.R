@@ -5,6 +5,9 @@ mprov <- readRDS("data-generated/fit-endDec-provincewide.rds")
 m7 <- readRDS("data-generated/fit-endDec-individual-regions.rds")
 region_names <- c("Island", "Coastal", "Northern", "Interior", "Fraser")
 
+library(dplyr)
+library(ggplot2)
+
 .hist_blue <- RColorBrewer::brewer.pal(6, "Blues")[5]
 .start <- lubridate::ymd_hms("2020-03-01 00:00:00")
 ts_df <- dplyr::tibble(time = m7$time, time_num = seq_along(m7$time))
