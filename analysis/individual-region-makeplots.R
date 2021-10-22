@@ -1,8 +1,8 @@
-# Make plots based on individual region and provincial-wide fits
-# Needs results saved from "run-individual-region.R" and "run-provincewide.R"
+# Make plots based on individual region and hierarchical fits
+# Needs results saved from "run-individual-region.R" and "run-multiregion.R"
 
-mprov <- readRDS("data-generated/fit-endDec-provincewide.rds")
-m7 <- readRDS("data-generated/fit-endDec-individual-regions.rds")
+load("data-generated/fit-endDec-multiregion.rda")
+mindiv <- readRDS("data-generated/fit-endDec-individual-regions.rds")
 region_names <- c("Island", "Coastal", "Northern", "Interior", "Fraser")
 
 library(dplyr)
@@ -12,27 +12,26 @@ library(ggplot2)
 .start <- lubridate::ymd_hms("2020-03-01 00:00:00")
 ts_df <- dplyr::tibble(time = m7$time, time_num = seq_along(m7$time))
 
-f2p <- mprov$post$f2
-f3p <- mprov$post$f3
-f4p <- mprov$post$f4
-f5p <- mprov$post$f5
-f6p <- mprov$post$f6
-f7p <- mprov$post$f7
-sampFrac_1p <- mprov$post$sampFrac_1
-sampFrac_2p <- mprov$post$sampFrac_2
-sampFrac_3p <- mprov$post$sampFrac_3
-sampFrac_4p <- mprov$post$sampFrac_4
-R0p <- tibble(f=mprov$post$R0, para = 1)
+R0p <- tibble(f=m7$post$R0, para = 1)
 
 library(latex2exp)
 for (region in 1:5) {
-  f2 <- m7[[region]]$post$f2[,1]
-  f3 <- m7[[region]]$post$f3[,1]
-  f4 <- m7[[region]]$post$f4[,1]
-  f5 <- m7[[region]]$post$f5[,1]
-  f6 <- m7[[region]]$post$f6[,1]
-  f7 <- m7[[region]]$post$f7[,1]
-  R0 <- tibble(f=m7[[region]]$post$R0, para = 1)
+  # Hierarchical fit
+  f2p <- m7$post$f2[,region]
+  f3p <- m7$post$f3[,region]
+  f4p <- m7$post$f4[,region]
+  f5p <- m7$post$f5[,region]
+  f6p <- m7$post$f6[,region]
+  f7p <- m7$post$f7[,region]  
+
+  # Individual region fit
+  f2 <- mindiv[[region]]$post$f2[,1]
+  f3 <- mindiv[[region]]$post$f3[,1]
+  f4 <- mindiv[[region]]$post$f4[,1]
+  f5 <- mindiv[[region]]$post$f5[,1]
+  f6 <- mindiv[[region]]$post$f6[,1]
+  f7 <- mindiv[[region]]$post$f7[,1]
+  R0 <- tibble(f=mindiv[[region]]$post$R0, para = 1)
   
   ggplot(R0, aes(x=f)) + geom_density(alpha = 0.7, fill = .hist_blue, colour = NA, adjust = 1.25) +
     geom_density(data = R0p, colour="NA", fill="dark red", alpha = 0.5, adjust = 1.25) + 
@@ -57,11 +56,16 @@ for (region in 1:5) {
     ggtitle(region_names[region]) 
   
   ggsave(paste0("figs-ms/individual-f-", region_names[region], ".pdf"), width = 7, height = 2.7)
-  
-  sampFrac_1<-m7[[region]]$post$sampFrac_1[,1]
-  sampFrac_2<-m7[[region]]$post$sampFrac_2[,1]
-  sampFrac_3<-m7[[region]]$post$sampFrac_3[,1]
-  sampFrac_4<-m7[[region]]$post$sampFrac_4[,1]
+
+  sampFrac_1p<-m7$post$sampFrac_1[,region]
+  sampFrac_2p<-m7$post$sampFrac_2[,region]
+  sampFrac_3p<-m7$post$sampFrac_3[,region]
+  sampFrac_4p<-m7$post$sampFrac_4[,region]
+    
+  sampFrac_1<-mindiv[[region]]$post$sampFrac_1[,1]
+  sampFrac_2<-mindiv[[region]]$post$sampFrac_2[,1]
+  sampFrac_3<-mindiv[[region]]$post$sampFrac_3[,1]
+  sampFrac_4<-mindiv[[region]]$post$sampFrac_4[,1]
   com1 <-tibble(f = c(sampFrac_1,sampFrac_2,sampFrac_3,sampFrac_4), R0 = rep(R0$f,4), para = rep(c(1,2,3,4), each=length(sampFrac_1)))
   com2 <- tibble(f = c(sampFrac_1p,sampFrac_2p,sampFrac_3p,sampFrac_4p), para = rep(c(1,2,3,4), each=length(sampFrac_1p)))
   
